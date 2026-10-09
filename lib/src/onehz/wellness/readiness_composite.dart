@@ -78,13 +78,13 @@ class ReadinessInput {
 }
 
 /// Canonical default inputs (caller supplies values + baselines). Weights encode
-/// the disclosed HRV > RHR > RR > temp ordering.
+/// the true server ML-derived ordering: HRV > RHR > RR > temp.
 ReadinessInput hrvInput(double? v, List<double> base) =>
-    ReadinessInput('HRV', v, base, 1, 0.40);
+    ReadinessInput('HRV', v, base, 1, 0.607);
 ReadinessInput rhrInput(double? v, List<double> base) =>
-    ReadinessInput('RHR', v, base, -1, 0.30, quantum: 1); // whole bpm
+    ReadinessInput('RHR', v, base, -1, 0.265, quantum: 1); // whole bpm
 ReadinessInput respInput(double? v, List<double> base) =>
-    ReadinessInput('RR', v, base, -1, 0.20);
+    ReadinessInput('RR', v, base, -1, 0.073);
 
 /// The skin-temp driver — GATED ON SETTLEDNESS, and the gate has no safe
 /// default.
@@ -114,18 +114,18 @@ ReadinessInput tempInput(
   double? settledFraction,
   double minSettledFraction = kMinSettledFraction,
 }) {
-  if (v == null) return ReadinessInput('temp', null, base, -1, 0.10);
+  if (v == null) return ReadinessInput('temp', null, base, -1, 0.055);
   if (settledFraction == null) {
-    return ReadinessInput('temp', null, base, -1, 0.10,
+    return ReadinessInput('temp', null, base, -1, 0.055,
         refusal: 'temp: no settled fraction measured for this night — an '
             'ungated nightly mean cannot tell skin from a warming strap');
   }
   if (settledFraction < minSettledFraction) {
-    return ReadinessInput('temp', null, base, -1, 0.10,
+    return ReadinessInput('temp', null, base, -1, 0.055,
         refusal: 'temp: unsettled_skin_temp:settled='
             '${round6(settledFraction)},need=${round6(minSettledFraction)}');
   }
-  return ReadinessInput('temp', v, base, -1, 0.10, quantum: 1); // 1 ADC count
+  return ReadinessInput('temp', v, base, -1, 0.055, quantum: 1); // 1 ADC count
 }
 
 class Readiness {
@@ -287,7 +287,7 @@ const int readinessCompositeMinBaseline = 14;
 /// Renormalising over present inputs is the frozen catalog's own rule
 /// ("Reweight on missing inputs, don't zero") and stays. What it must not do is
 /// hand the WHOLE 0..100 score to one input: with only `temp` present, its
-/// disclosed 0.10 becomes an effective 1.0 and a single sensor artifact IS the
+/// disclosed 0.055 becomes an effective 1.0 and a single sensor artifact IS the
 /// headline. Reachable — each input needs its own ≥3-night baseline and the four
 /// series fill at different rates. On the real gen4 corpus two of seventeen days
 /// scored off exactly one input (readiness 44.7 and 0.8); both now read "—".

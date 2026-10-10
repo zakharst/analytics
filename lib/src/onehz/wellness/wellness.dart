@@ -37,3 +37,4 @@ export 'anomaly.dart';
 export 'changepoint.dart';
 export 'readiness_composite.dart';
 export 'biological_age.dart';
+export 'journal_correlation.dart';

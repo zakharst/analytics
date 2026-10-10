@@ -36,3 +36,4 @@ export 'cycle_lengths.dart';
 export 'anomaly.dart';
 export 'changepoint.dart';
 export 'readiness_composite.dart';
+export 'biological_age.dart';

@@ -39,3 +39,4 @@ export 'readiness_composite.dart';
 export 'biological_age.dart';
 export 'journal_correlation.dart';
 export 'rep_counter.dart';
+export 'stress_monitor.dart';

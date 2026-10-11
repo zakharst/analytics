@@ -38,9 +38,9 @@ class BiologicalAgeCalculator {
     // 1. VO2 Max Modifier (40% weight)
     // Uth–Sørensen–Overgaard–Pedersen formula
     final double vo2MaxEst = 15.3 * (maxHr / avgRhr);
-    
+
     // Simplistic normative VO2 max calculation (baseline ~45 for a 30yo, drops by ~0.5 per year)
-    final double expectedVo2Max = 45.0 - (chronologicalAge - 30) * 0.5; 
+    final double expectedVo2Max = 45.0 - (chronologicalAge - 30) * 0.5;
     final double vo2Diff = vo2MaxEst - expectedVo2Max;
     // Every 3 points above expected = -1 year
     double vo2Modifier = -(vo2Diff / 3.0);
@@ -61,21 +61,25 @@ class BiologicalAgeCalculator {
       rhrModifier = -2.0;
     } else if (avgRhr < 60) {
       rhrModifier = -1.0;
-    } else if (avgRhr > 75) {
-      rhrModifier = 1.0;
     } else if (avgRhr > 85) {
       rhrModifier = 2.0;
+    } else if (avgRhr > 75) {
+      rhrModifier = 1.0;
     }
 
     // 4. Lifestyle Modifier (Sleep & Steps) (15% weight)
     double lifestyleModifier = 0.0;
     if (sleepConsistency >= 0.85) lifestyleModifier -= 1.0;
     if (sleepConsistency <= 0.60) lifestyleModifier += 1.0;
-    
+
     if (avgDailySteps >= 10000) lifestyleModifier -= 1.0;
     if (avgDailySteps <= 4000) lifestyleModifier += 1.0;
 
-    final double totalBiologicalAge = chronologicalAge + vo2Modifier + hrvModifier + rhrModifier + lifestyleModifier;
+    final double totalBiologicalAge = chronologicalAge +
+        vo2Modifier +
+        hrvModifier +
+        rhrModifier +
+        lifestyleModifier;
 
     return BiologicalAgeResult(
       chronologicalAge: chronologicalAge,

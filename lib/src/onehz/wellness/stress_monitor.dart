@@ -1,13 +1,12 @@
 /// Next-Gen Real-Time Stress Monitor
-/// Calculates psychological/physiological stress (0.0 to 3.0) 
+/// Calculates psychological/physiological stress (0.0 to 3.0)
 /// by analyzing HR/HRV against baselines, strictly filtering out physical activity.
-
-import 'dart:math';
 
 class StressResult {
   final double stressScore; // 0.0 to 3.0
   final String category; // Low, Medium, High
-  final bool isExercise; // If true, stress is 0 because user is physically active
+  final bool
+      isExercise; // If true, stress is 0 because user is physically active
 
   StressResult({
     required this.stressScore,
@@ -37,7 +36,7 @@ class StressMonitorEngine {
     required double activityLevel,
   }) {
     // 1. Filter out physical activity
-    // If the user is moving significantly (e.g., walking, running), elevated HR 
+    // If the user is moving significantly (e.g., walking, running), elevated HR
     // is due to mechanical work, not psychological stress.
     if (activityLevel > 0.3) {
       return StressResult(
@@ -51,13 +50,13 @@ class StressMonitorEngine {
     // How elevated is the current HR compared to the absolute resting baseline?
     // E.g., RHR = 50. Current = 85. Ratio = 1.7.
     double hrRatio = currentHr / baselineRhr;
-    
+
     // Normal awake HR is usually 1.2x to 1.5x RHR.
     // Anything above 1.5x while sitting still is physiological stress.
     double hrStress = 0.0;
     if (hrRatio > 1.2) {
       // Scale it so that 2.0x RHR gives max HR stress component
-      hrStress = ((hrRatio - 1.2) / 0.8) * 3.0; 
+      hrStress = ((hrRatio - 1.2) / 0.8) * 3.0;
     }
 
     // 3. HRV Component (Secondary driver, if available)
@@ -65,7 +64,7 @@ class StressMonitorEngine {
     if (currentHrv != null && baselineHrv != null && baselineHrv > 0) {
       // Lower HRV means higher sympathetic nervous system (stress) activity.
       double hrvRatio = currentHrv / baselineHrv;
-      
+
       if (hrvRatio < 0.9) {
         // If HRV is dropped by half (0.5x), that's max stress
         hrvStress = ((0.9 - hrvRatio) / 0.4) * 3.0;

@@ -27,7 +27,8 @@
 //      RENORMALIZED over the inputs actually present (missing inputs are
 //      dropped, never zero-imputed).
 //      HRV and RHR form ONE autonomic input (mean of their oriented z's, weight
-//      0.70) — see [readinessAutonomicLabels].
+//      0.872 under the current research weights) — see
+//      [readinessAutonomicLabels].
 //   4. The composite z is mapped to a 0..100 score via a logistic so typical
 //      days land near 50, rescaled by the user's own composite-z spread once
 //      14 prior nights exist, and re-centred on their median (capped ±0.5)
@@ -169,8 +170,8 @@ class Readiness {
 /// z's, carrying their combined weight.
 const Set<String> readinessAutonomicLabels = {'HRV', 'RHR'};
 
-/// Combined weight of the autonomic input (HRV 0.40 + RHR 0.30).
-const double readinessAutonomicWeight = 0.70;
+/// Combined default weight of the autonomic input (HRV 0.607 + RHR 0.265).
+const double readinessAutonomicWeight = 0.872;
 
 /// Combine sign-oriented z's into the composite. [used] is every input that
 /// produced a z; [autonomicWeight] is the weight the HRV/RHR group carries
@@ -431,8 +432,8 @@ Metric<Readiness> readinessComposite(
     inputs_used: used,
     drivers: normDrivers,
     note:
-        'GLASS-BOX readiness: disclosed weights autonomic (HRV+RHR, '
-        'mean of their z) 0.70 > RR 0.20 > temp 0.10, renormalized over present '
+        'GLASS-BOX readiness: disclosed research weights autonomic (HRV+RHR, '
+        'mean of their z) 0.872 > RR 0.073 > temp 0.055, renormalized over present '
         'inputs. Drivers are definitional within the formula (correction, not '
         'inferred cause). '
         '${cal.sigma == null ? 'calibrating:have=${cal.nights},need=$readinessCalibrationMinNights' : 'calibrated:sigma=${round6(cal.sigma!)},n=${cal.nights},'

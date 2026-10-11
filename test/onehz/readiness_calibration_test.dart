@@ -8,7 +8,7 @@ List<double> around(double c, double step) =>
 
 void main() {
   group('autonomic input (HRV + RHR count once)', () {
-    test('HRV and RHR share 0.70 as the mean of their oriented z', () {
+    test('HRV and RHR share 0.872 as the mean of their oriented z', () {
       final m = readinessComposite([
         hrvInput(4.0, around(4.5, 0.1)), // well below baseline
         rhrInput(60.0, around(52.0, 2.0)), // well above baseline
@@ -20,32 +20,34 @@ void main() {
           m.drivers!.firstWhere((d) => d.label == l).detail!.split('=').last);
       final zH = oz('HRV'), zR = oz('RHR');
       // RR and temp sit on their medians (z 0), so the composite is the
-      // autonomic input alone: 0.70 × mean(zH, zR) over a total weight of 1.0.
-      expect(m.value!.compositeZ, closeTo(0.70 * (zH + zR) / 2, 1e-5));
-      expect(c['HRV'], closeTo(0.35 * zH, 1e-5));
-      expect(c['RHR'], closeTo(0.35 * zR, 1e-5));
+      // autonomic input alone: 0.872 × mean(zH, zR) over a total weight of 1.0.
+      expect(m.value!.compositeZ, closeTo(0.872 * (zH + zR) / 2, 1e-5));
+      expect(c['HRV'], closeTo(0.436 * zH, 1e-5));
+      expect(c['RHR'], closeTo(0.436 * zR, 1e-5));
     });
 
-    test('one autonomic member alone carries the whole 0.70', () {
+    test('one autonomic member alone carries the whole research weight', () {
       final r = combineReadinessZ([
         (label: 'HRV', weight: 0.40, orientedZ: -1.0),
         (label: 'RR', weight: 0.20, orientedZ: 1.0),
       ]);
-      expect(r.weightSum, closeTo(0.90, 1e-12));
-      expect(r.z, closeTo((0.70 * -1.0 + 0.20 * 1.0) / 0.90, 1e-12));
+      expect(r.weightSum, closeTo(1.072, 1e-12));
+      expect(r.z, closeTo((0.872 * -1.0 + 0.20 * 1.0) / 1.072, 1e-12));
     });
 
     test('a correlated HRV/RHR dip no longer outweighs everything else', () {
       // Old weights: (0.4·-2 + 0.3·-2 + 0.2·2 + 0.1·2)/1.0 = -0.8.
-      // Autonomic group: (0.7·-2 + 0.2·2 + 0.1·2)/1.0 = -0.8 too — the merge
-      // changes nothing when the two agree; it matters when they disagree.
+      // With the MOD research weight the grouped calculation is
+      // (0.872·-2 + 0.2·2 + 0.1·2)/1.172. The merge still matters when the
+      // correlated pair disagree: neither member wins merely because its old
+      // standalone weight was larger.
       final agree = combineReadinessZ([
         (label: 'HRV', weight: 0.4, orientedZ: -2.0),
         (label: 'RHR', weight: 0.3, orientedZ: -2.0),
         (label: 'RR', weight: 0.2, orientedZ: 2.0),
         (label: 'temp', weight: 0.1, orientedZ: 2.0),
       ]);
-      expect(agree.z, closeTo(-0.8, 1e-12));
+      expect(agree.z, closeTo((-1.744 + 0.4 + 0.2) / 1.172, 1e-12));
       // Disagreeing: HRV -2, RHR +2 → old -0.2 (HRV wins by weight), now 0.
       final disagree = combineReadinessZ([
         (label: 'HRV', weight: 0.4, orientedZ: -2.0),
